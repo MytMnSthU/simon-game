@@ -10,36 +10,11 @@ let noise = true; // if we are playing sounds or noise, it is true
 let on = false; // power button on or off
 let win; // the game is win or not
 
-let green = {
-    id: 1,
-    sound: "clip1",
-    elmName: "topleft",
-    color: "lightgreen",
-};
-let red = {
-    id: 2,
-    sound: "clip2",
-    elmName: "topright",
-    color: "tomato",
-};
-let yellow = {
-    id: 3,
-    sound: "clip3",
-    elmName: "bottomleft",
-    color: "yellow",
-};
-let blue = {
-    id: 4,
-    sound: "clip4",
-    elmName: "bottomright",
-    color: "lightskyblue",
-};
-
-let unpressColors = ["darkgreen", "darkred", "goldenrod", "darkblue"];
-let pressColors = ["lightgreen", "tomato", "yellow", "lightskyblue"];
-
 const turnCounter = document.querySelector("#turn");
-const colorBtns = document.querySelectorAll(".btn-color");
+const topLeft = document.querySelector("#topleft");
+const topRight = document.querySelector("#topright");
+const bottomLeft = document.querySelector("#bottomleft");
+const bottomRight = document.querySelector("#bottomright");
 const strictBtn = document.querySelector("#strict");
 const onBtn = document.querySelector("#on");
 const startBtn = document.querySelector("#start");
@@ -60,24 +35,15 @@ onBtn.addEventListener("click", () => {
         on = false;
         turnCounter.innerHTML = "";
 
-        colorAction("clear");
+        clearColor();
         clearInterval(intervalId);
     }
 });
 
 startBtn.addEventListener("click", () => {
-    if (on || win) play();
-});
-
-colorBtns.forEach((colorBtn) => {
-    colorBtn.addEventListener("click", () => {
-        let color = colorBtn.dataset.color;
-        
-        if (color == "green") action(green, green.id);
-        if (color == "red") action(red, red.id);
-        if (color == "yellow") action(yellow, yellow.id);
-        if (color == "blue") action(blue, blue.id);
-    });
+    if (on || win) {
+        play();
+    }
 });
 
 function play() {
@@ -106,55 +72,116 @@ function gameTurn() {
     if (flash == turn) {
         clearInterval(intervalId);
         compTurn = false;
-        colorAction("clear");
+        clearColor();
         on = true;
     }
 
     if (compTurn) {
-        colorAction("clear");
+        clearColor();
         setTimeout(() => {
-            if (order[flash] == 1) press(green);
-            if (order[flash] == 2) press(red);
-            if (order[flash] == 3) press(yellow);
-            if (order[flash] == 4) press(blue);
+            if (order[flash] == 1) one();
+            if (order[flash] == 2) two();
+            if (order[flash] == 3) three();
+            if (order[flash] == 4) four();
             flash++;
         }, 200);
     }
 }
 
-function press(name) {
+function one() {
     if (noise) {
-        let audio = document.getElementById(name.sound);
+        let audio = document.getElementById("clip1");
         audio.play();
     }
     noise = true;
-    document.getElementById(name.elmName).style.backgroundColor = name.color;
+    topLeft.style.backgroundColor = "lightgreen";
 }
-
-function colorAction(cmd) {
-    if (cmd == "clear") {
-        colorBtns.forEach((btn, idx) => {
-            btn.style.backgroundColor = unpressColors[idx];
-        });
-    } else {
-        colorBtns.forEach((btn, idx) => {
-            btn.style.backgroundColor = pressColors[idx];
-        });
+function two() {
+    if (noise) {
+        let audio = document.getElementById("clip2");
+        audio.play();
     }
+    noise = true;
+    topRight.style.backgroundColor = "tomato";
+}
+function three() {
+    if (noise) {
+        let audio = document.getElementById("clip3");
+        audio.play();
+    }
+    noise = true;
+    bottomLeft.style.backgroundColor = "yellow";
+}
+function four() {
+    if (noise) {
+        let audio = document.getElementById("clip4");
+        audio.play();
+    }
+    noise = true;
+    bottomRight.style.backgroundColor = "lightskyblue";
 }
 
-function action(name,id) {
+function clearColor() {
+    topLeft.style.backgroundColor = "darkgreen";
+    topRight.style.backgroundColor = "darkred";
+    bottomLeft.style.backgroundColor = "goldenrod";
+    bottomRight.style.backgroundColor = "darkblue";
+}
+function flashColor() {
+    topLeft.style.backgroundColor = "lightgreen";
+    topRight.style.backgroundColor = "tomato";
+    bottomLeft.style.backgroundColor = "yellow";
+    bottomRight.style.backgroundColor = "lightskyblue";
+}
+
+topLeft.addEventListener("click", () => {
     if (on) {
-        playerOrder.push(id);
+        playerOrder.push(1);
         check();
-        press(name);
+        one();
         if (!win) {
             setTimeout(() => {
-                colorAction("clear");
+                clearColor();
             }, 300);
         }
     }
-}
+});
+topRight.addEventListener("click", () => {
+    if (on) {
+        playerOrder.push(2);
+        check();
+        two();
+        if (!win) {
+            setTimeout(() => {
+                clearColor();
+            }, 300);
+        }
+    }
+});
+bottomLeft.addEventListener("click", () => {
+    if (on) {
+        playerOrder.push(3);
+        check();
+        three();
+        if (!win) {
+            setTimeout(() => {
+                clearColor();
+            }, 300);
+        }
+    }
+});
+bottomRight.addEventListener("click", () => {
+    if (on) {
+        playerOrder.push(4);
+        check();
+        four();
+        if (!win) {
+            setTimeout(() => {
+                clearColor();
+            }, 300);
+        }
+    }
+});
 
 function check() {
     if (playerOrder[playerOrder.length - 1] !== order[playerOrder.length - 1])
@@ -163,12 +190,12 @@ function check() {
     if (playerOrder.length == 10 && good) winGame();
 
     if (good == false) {
-        colorAction();
+        flashColor();
         turnCounter.innerHTML = "NO!";
 
         setTimeout(() => {
             turnCounter.innerHTML = turn;
-            colorAction("clear");
+            clearColor();
 
             if (strict) {
                 play();
@@ -195,7 +222,7 @@ function check() {
 }
 
 function winGame() {
-    colorAction();
+    flashColor();
     turnCounter.innerHTML = "WIN!";
     on = false;
     win = true;
